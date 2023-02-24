@@ -1,22 +1,41 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace TicTacToe
 {
-    public class FirstPlayer : MonoBehaviour
+    public class FirstPlayer : Player
     {
-        // Start is called before the first frame update
-        void Start()
-        {
         
+        public static Action FirstPlayerFinishedMove;
+
+        protected override void AfterInitialization()
+        {
+            playerType = PlayerType.First;
+            Invoke("RandomAI", 2f);
         }
 
-        // Update is called once per frame
-        void Update()
+        private void OnEnable()
         {
-        
+            SecondPlayer.SecondPlayerFinishedMove += RandomAI;
         }
+        
+        private void OnDisable()
+        {
+            SecondPlayer.SecondPlayerFinishedMove -= RandomAI;
+        }
+
+        protected override void InvokeFinishedMove()
+        {
+            FirstPlayerFinishedMove?.Invoke();
+        }
+
+        private void RandomAI()
+        {
+            MakeRandomMove();
+        }
+        
     }
     
 }

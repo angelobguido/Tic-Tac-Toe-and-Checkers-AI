@@ -6,16 +6,14 @@ namespace TicTacToe
 {
     public class BoardDrawer : MonoBehaviour
     {
-        // Start is called before the first frame update
-        void Start()
-        {
+        [SerializeField] private Transform[] positions;
+        [SerializeField] private GameObject firstPlayerPiece;
+        [SerializeField] private GameObject secondPlayerPiece;
         
-        }
-
-        // Update is called once per frame
-        void Update()
+        public void Draw(PlayerType player, int row, int column)
         {
-        
+            var playerPiece = (player == PlayerType.First) ? firstPlayerPiece : secondPlayerPiece;
+            Instantiate(playerPiece, positions[row*3 + column].position, Quaternion.identity);
         }
     }    
 }

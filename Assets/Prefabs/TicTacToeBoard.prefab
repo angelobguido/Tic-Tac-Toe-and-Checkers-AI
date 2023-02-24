@@ -270,9 +270,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1948920376504665303}
+  - component: {fileID: 7344952222054961894}
   m_Layer: 0
   m_Name: TicTacToeBoard
-  m_TagString: Untagged
+  m_TagString: Board
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -305,6 +306,30 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7344952222054961894
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1948920376504665296}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f2a11a474ac0d464880168aa37d5abf2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  positions:
+  - {fileID: 1948920376902546729}
+  - {fileID: 1948920377759237409}
+  - {fileID: 1948920377824221063}
+  - {fileID: 1948920375923259602}
+  - {fileID: 1948920377727618770}
+  - {fileID: 1948920376013763415}
+  - {fileID: 1948920376464192755}
+  - {fileID: 1948920377601189661}
+  - {fileID: 1948920377408308067}
+  firstPlayerPiece: {fileID: 11850347142699226, guid: 44a8f07832a8cc445aefa3548eac530c, type: 3}
+  secondPlayerPiece: {fileID: 511120043818546503, guid: 33f2c0542c891a547a52668d2f56f0f3, type: 3}
 --- !u!1 &1948920376902546730
 GameObject:
   m_ObjectHideFlags: 0

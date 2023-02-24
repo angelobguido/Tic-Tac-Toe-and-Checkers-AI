@@ -10,9 +10,12 @@ namespace TicTacToe
     {
         public static Action SecondPlayerFinishedMove;
 
+        private MCTS mcts;
+
         protected override void AfterInitialization()
         {
             playerType = PlayerType.Second;
+            mcts = new MCTS(game, PlayerType.Second);
         }
         
         private void OnEnable()
@@ -33,6 +36,7 @@ namespace TicTacToe
         
         private void MakeDecision()
         {
+            mcts
             MakeRandomMove();
         }
 

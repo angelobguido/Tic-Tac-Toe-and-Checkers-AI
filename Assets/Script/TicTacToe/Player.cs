@@ -22,20 +22,24 @@ namespace TicTacToe
         
         public void MakeMove(Move move)
         {
+            var state = game.MakeMove(move);
+            var lastMove = game.GetLastMove();
             
-            game.MakeMove(move);
-            drawer.Draw(playerType, move.row, move.column);
-            InvokeFinishedMove();
-          
+            AfterMove(lastMove, state);
         }
         
         public void MakeRandomMove()
         {
-
             var state = game.MakeRandomMove();
             var lastMove = game.GetLastMove();
             
-            drawer.Draw(playerType, lastMove.row, lastMove.column);
+            AfterMove(lastMove, state);
+        }
+
+        private void AfterMove(Move move, GameState state)
+        {
+            
+            drawer.Draw(playerType, move.row, move.column);
             
             if (state == GameState.InProgress)
             {
@@ -53,8 +57,7 @@ namespace TicTacToe
                         break;
                 }
             }
-            
-          
+
         }
 
         protected abstract void InvokeFinishedMove();

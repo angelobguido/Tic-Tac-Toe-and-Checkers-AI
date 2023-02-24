@@ -19,6 +19,23 @@ namespace TicTacToe
             InitValidMoves();
         }
 
+        public Game(Game copy)
+        {
+            board = new char[3, 3];
+            for (var i = 0; i < 3; i++)
+            {
+                for (var j = 0; j < 3; j++)
+                {
+                    board[i, j] = copy.board[i, j];
+                }
+            }
+
+            validMoves = new List<Move>(copy.validMoves);
+            currentPlayer = copy.currentPlayer;
+            lastMove = copy.lastMove;
+            
+        }
+
         private void InitValidMoves()
         {
             validMoves = new List<Move>();
@@ -41,7 +58,7 @@ namespace TicTacToe
 
             board[move.row,move.column] = GetPlayerRepresentation();
             lastMove = move;
-            var moveIndex = validMoves.FindIndex(validMove => validMove.row == move.row && validMove.column == move.column);
+            var moveIndex = validMoves.FindIndex(validMove => validMove.Equals(move));
             validMoves.RemoveAt(moveIndex);
 
             ChangePlayer();
@@ -146,6 +163,11 @@ namespace TicTacToe
         public Move GetLastMove()
         {
             return lastMove;
+        }
+
+        public List<Move> GetValidMoves()
+        {
+            return validMoves;
         }
 
     }

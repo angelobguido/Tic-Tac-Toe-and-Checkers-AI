@@ -11,6 +11,7 @@ namespace TicTacToe
         private List<Move> validMoves;
         private PlayerType currentPlayer = PlayerType.First;
         private Move lastMove;
+        private GameState currentGameState = GameState.InProgress;
 
         public Game()
         {
@@ -33,7 +34,8 @@ namespace TicTacToe
             validMoves = new List<Move>(copy.validMoves);
             currentPlayer = copy.currentPlayer;
             lastMove = copy.lastMove;
-            
+            currentGameState = copy.currentGameState;
+
         }
 
         private void InitValidMoves()
@@ -53,7 +55,7 @@ namespace TicTacToe
         {
             if (board[move.row,move.column] == 'X' || board[move.row,move.column] == 'O')
             {
-                throw new System.Exception("Player " + ( (currentPlayer == PlayerType.First) ? 'X':'O') + " can't play at that position" );
+                throw new System.Exception("Player " + ( (currentPlayer == PlayerType.First) ? 'X':'O') + " can't play at that position: " + $"({move.row}, {move.column})" );
             }
 
             board[move.row,move.column] = GetPlayerRepresentation();
@@ -63,8 +65,15 @@ namespace TicTacToe
 
             ChangePlayer();
             
-            return CheckGameState();
-            
+            currentGameState = CheckGameState();
+
+            return currentGameState;
+
+        }
+
+        public GameState GetCurrentGameState()
+        {
+            return currentGameState;
         }
         
         private GameState CheckGameState()

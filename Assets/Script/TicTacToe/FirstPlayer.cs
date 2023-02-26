@@ -28,12 +28,14 @@ namespace TicTacToe
 
         protected override void InvokeFinishedMove()
         {
+            Debug.Log("Invoked player one finished");
             FirstPlayerFinishedMove?.Invoke();
         }
 
         private void RandomAI()
         {
-            MakeRandomMove();
+            //MakeRandomMove();
+            MakeDeterminedMove();
         }
         
     }

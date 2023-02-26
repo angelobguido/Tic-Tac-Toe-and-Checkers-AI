@@ -1,6 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
+using Unity.VisualScripting;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace TicTacToe
 {
@@ -17,36 +20,88 @@ namespace TicTacToe
             player = targetPlayer;
             game = currentGame;
             root = new Node(game);
+            root.Expand();
         }
 
-        private Node SelectNextNodeFrom(Node node)
+        private void GetRolloutAndBackPropagate(Node node)
         {
-            node.children.Sort((a,b) => b.GetUCB().CompareTo(a.GetUCB()) );
-            return node.children[0];
-        }
+            var finalState = node.GetRollout();
+            float value = 0f;
 
-        private void Expand(Node node)
-        {
-            var validMoves = node.game.GetValidMoves();
-            validMoves.ForEach( validMove => node.children.Add(new Node(node, validMove, node.game)) );
+            switch (finalState)
+            {
+                case GameState.Tie: value = 0f;
+                    break;
+                
+                case GameState.PlayerOneWins: value = (player == PlayerType.First) ? (1f) : (-1f);
+                    break;
+                
+                case GameState.PlayerTwoWins: value = (player == PlayerType.First) ? (-1f) : (1f);
+                    break;
+                
+            }
+            
+            var currentNode = node;
+            while (currentNode != root)
+            {
+                currentNode.value += value;
+                value *= -1f;
+                currentNode = currentNode.parent;
+            }
         }
 
         public void Update()
         {
             var lastMove = game.GetLastMove();
             var newRoot = root.children.Find(node => node.move.Equals(lastMove));
-
+            
+            Debug.Log($"{newRoot}... ({lastMove.row}, {lastMove.column})");
+            
             root = newRoot;
+            
+            /*
+            string debugString = "";
+            
+            root.children.ForEach( node => debugString+=(" "+ node.GetAverageValue() + "(" + node.move.row + ", " + node.move.column + ")"));
+            
+            Debug.Log(debugString);
+            */
         }
 
         public Move FindBestMove()
         {
+            for (var i = 0; i < NumberOfIterations; i++)
+                ProcessTree();
             
+            root.children.Sort( (a,b) => b.GetAverageValue().CompareTo(a.GetAverageValue()) );
+
+            var bestMove = root.children[0].move;
+
+            return bestMove;
         }
 
-        private Move _FindBestMove(Node current)
+        private void ProcessTree()
         {
-            current
+
+            var currentNode = root;
+            
+            while (!currentNode.IsLeaf())
+            {
+                currentNode.Visit();
+                currentNode = currentNode.SelectNextNode();
+            }
+            
+            currentNode.Expand();
+
+            //If there are no moves left, the current node will still be a leaf, so just return
+            if (currentNode.IsLeaf())
+                return;
+            
+            var nextNode = currentNode.SelectNextNode();
+            nextNode.Visit();
+            GetRolloutAndBackPropagate(nextNode);
+
+            
         }
         
     }

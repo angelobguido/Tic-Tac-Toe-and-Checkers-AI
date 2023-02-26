@@ -36,6 +36,15 @@ namespace TicTacToe
             AfterMove(lastMove, state);
         }
 
+        public void MakeDeterminedMove()
+        {
+            var moves = new List<Move>(game.GetValidMoves());
+            moves.Sort((a, b) => (a.row * 3 + a.column).CompareTo( b.row * 3 + b.column ) );
+            var move = moves[0];
+
+            MakeMove(move);
+        }
+
         private void AfterMove(Move move, GameState state)
         {
             

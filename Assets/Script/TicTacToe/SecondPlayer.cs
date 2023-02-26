@@ -36,8 +36,10 @@ namespace TicTacToe
         
         private void MakeDecision()
         {
-            mcts
-            MakeRandomMove();
+            mcts.Update();
+            var bestMove = mcts.FindBestMove();
+            MakeMove(bestMove);
+            mcts.Update();
         }
 
     }    

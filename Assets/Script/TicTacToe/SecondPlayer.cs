@@ -31,6 +31,7 @@ namespace TicTacToe
         
         protected override void InvokeFinishedMove()
         {
+            mcts.Update();
             SecondPlayerFinishedMove?.Invoke();
         }
         
@@ -39,7 +40,6 @@ namespace TicTacToe
             mcts.Update();
             var bestMove = mcts.FindBestMove();
             MakeMove(bestMove);
-            mcts.Update();
         }
 
     }    

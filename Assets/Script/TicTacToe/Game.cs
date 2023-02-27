@@ -9,7 +9,7 @@ namespace TicTacToe
     {
         private char[,] board;
         private List<Move> validMoves;
-        private PlayerType currentPlayer = PlayerType.First;
+        private PlayerType nextPlayer = PlayerType.First;
         private Move lastMove;
         private GameState currentGameState = GameState.InProgress;
 
@@ -32,7 +32,7 @@ namespace TicTacToe
             }
 
             validMoves = new List<Move>(copy.validMoves);
-            currentPlayer = copy.currentPlayer;
+            nextPlayer = copy.nextPlayer;
             lastMove = copy.lastMove;
             currentGameState = copy.currentGameState;
 
@@ -55,7 +55,7 @@ namespace TicTacToe
         {
             if (board[move.row,move.column] == 'X' || board[move.row,move.column] == 'O')
             {
-                throw new System.Exception("Player " + ( (currentPlayer == PlayerType.First) ? 'X':'O') + " can't play at that position: " + $"({move.row}, {move.column})" );
+                throw new System.Exception("Player " + ( (nextPlayer == PlayerType.First) ? 'X':'O') + " can't play at that position: " + $"({move.row}, {move.column})" );
             }
 
             board[move.row,move.column] = GetPlayerRepresentation();
@@ -74,6 +74,11 @@ namespace TicTacToe
         public GameState GetCurrentGameState()
         {
             return currentGameState;
+        }
+
+        public PlayerType GetNextPlayerToPlay()
+        {
+            return nextPlayer;
         }
         
         private GameState CheckGameState()
@@ -153,12 +158,12 @@ namespace TicTacToe
         
         private void ChangePlayer()
         {
-            currentPlayer = (currentPlayer==PlayerType.First) ? (PlayerType.Second):(PlayerType.First);
+            nextPlayer = (nextPlayer==PlayerType.First) ? (PlayerType.Second):(PlayerType.First);
         }
 
         private char GetPlayerRepresentation()
         {
-            return (currentPlayer == PlayerType.First) ? 'X' : 'O';
+            return (nextPlayer == PlayerType.First) ? 'X' : 'O';
         }
 
         public GameState MakeRandomMove()

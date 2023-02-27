@@ -19,23 +19,24 @@ namespace TicTacToe
         private void OnEnable()
         {
             SecondPlayer.SecondPlayerFinishedMove += RandomAI;
+            CellClick.OnPositionClicked += MakeMove;
         }
         
         private void OnDisable()
         {
             SecondPlayer.SecondPlayerFinishedMove -= RandomAI;
+            CellClick.OnPositionClicked -= MakeMove;
         }
 
         protected override void InvokeFinishedMove()
         {
-            Debug.Log("Invoked player one finished");
             FirstPlayerFinishedMove?.Invoke();
         }
 
         private void RandomAI()
         {
             //MakeRandomMove();
-            MakeDeterminedMove();
+            
         }
         
     }

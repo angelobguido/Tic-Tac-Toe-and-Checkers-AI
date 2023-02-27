@@ -13,7 +13,7 @@ namespace TicTacToe
         private Game game;
         private PlayerType player;
         private Node root;
-        private static readonly int NumberOfIterations = 100;
+        private static readonly int NumberOfIterations = 1000;
         
         public MCTS(Game currentGame, PlayerType targetPlayer)
         {
@@ -25,6 +25,7 @@ namespace TicTacToe
 
         private void GetRolloutAndBackPropagate(Node node)
         {
+            var nextPlayerInNodeGame = node.game.GetNextPlayerToPlay();
             var finalState = node.GetRollout();
             float value = 0f;
 
@@ -40,6 +41,8 @@ namespace TicTacToe
                     break;
                 
             }
+
+            value *= (nextPlayerInNodeGame == player) ? (-1f) : (1f);
             
             var currentNode = node;
             while (currentNode != root)
@@ -55,17 +58,7 @@ namespace TicTacToe
             var lastMove = game.GetLastMove();
             var newRoot = root.children.Find(node => node.move.Equals(lastMove));
             
-            Debug.Log($"{newRoot}... ({lastMove.row}, {lastMove.column})");
-            
             root = newRoot;
-            
-            /*
-            string debugString = "";
-            
-            root.children.ForEach( node => debugString+=(" "+ node.GetAverageValue() + "(" + node.move.row + ", " + node.move.column + ")"));
-            
-            Debug.Log(debugString);
-            */
         }
 
         public Move FindBestMove()

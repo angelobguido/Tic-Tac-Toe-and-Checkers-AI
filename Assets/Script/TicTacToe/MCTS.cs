@@ -13,7 +13,7 @@ namespace TicTacToe
         private Game game;
         private PlayerType player;
         private Node root;
-        private static readonly int NumberOfIterations = 1000;
+        private static readonly int NumberOfIterations = 200;
         
         public MCTS(Game currentGame, PlayerType targetPlayer)
         {

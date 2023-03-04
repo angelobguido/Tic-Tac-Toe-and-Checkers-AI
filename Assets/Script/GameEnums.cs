@@ -16,15 +16,3 @@ public enum GameState: byte
     InProgress
 }
 
-namespace Checkers
-{
-    public enum Piece: byte
-    {
-        BasicBlack,
-        KingBlack,
-        BasicWhite,
-        KingWhite,
-        Nothing
-    }
-    
-}

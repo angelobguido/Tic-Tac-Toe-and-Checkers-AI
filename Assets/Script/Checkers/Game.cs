@@ -136,7 +136,7 @@ namespace Checkers
                     // Check if this piece belongs to the current player
                     var piece = board[row, col];
 
-                    var position = new Position(row, col);
+                    var position = new Vector2Int(row, col);
 
                     if ((nextPlayer == PlayerType.Second && piece == Piece.BasicBlack) ||
                         (nextPlayer == PlayerType.First && piece == Piece.BasicWhite))

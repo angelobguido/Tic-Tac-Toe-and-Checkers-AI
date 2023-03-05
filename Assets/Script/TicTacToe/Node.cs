@@ -19,7 +19,7 @@ namespace TicTacToe
         private Stack<Node> expandableChildren;
 
         private static readonly float RandomConstantMultiplier = 0.01f;
-        private static readonly float ExplorationConstant = 0.5f;
+        private static readonly float ExplorationConstant = 0.7f;
 
         public Node(Game game)
         {

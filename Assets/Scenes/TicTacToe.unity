@@ -123,6 +123,52 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &676476190
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 676476191}
+  - component: {fileID: 676476192}
+  m_Layer: 0
+  m_Name: GameManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &676476191
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 676476190}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &676476192
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 676476190}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91902063f79003340982df766953e481, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  first: {fileID: 1008008967}
+  second: {fileID: 1630575095}
 --- !u!1 &1008008965
 GameObject:
   m_ObjectHideFlags: 0
@@ -164,9 +210,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1008008965}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b26cf6fdefde8a54daff855d2a5d6735, type: 3}
+  m_Script: {fileID: 11500000, guid: 741efd374e1789642b036c642431ecb6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerType: 0
 --- !u!1 &1630575093
 GameObject:
   m_ObjectHideFlags: 0
@@ -208,9 +255,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1630575093}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cb53dc732fab8ec4982b5101b0d3beb7, type: 3}
+  m_Script: {fileID: 11500000, guid: ca8c80dfcd311d74ebf41f35a0856de9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerType: 1
 --- !u!1 &1983520134
 GameObject:
   m_ObjectHideFlags: 0

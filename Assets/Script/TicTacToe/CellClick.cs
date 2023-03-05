@@ -16,7 +16,7 @@ namespace TicTacToe
         
         public void OnClick()
         {
-            OnPositionClicked.Invoke(new Move(row, column));
+            OnPositionClicked?.Invoke(new Move(row, column));
         }
     }   
 }

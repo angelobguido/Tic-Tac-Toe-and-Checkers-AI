@@ -11,6 +11,7 @@ namespace TicTacToe
 
         [SerializeField] private Player first;
         [SerializeField] private Player second;
+        [SerializeField] private int nextScene;
         
         public static Game game;
 
@@ -53,7 +54,7 @@ namespace TicTacToe
                 
             }
 
-            SceneManager.LoadScene(0);
+            SceneManager.LoadScene(nextScene);
         }
     }
     

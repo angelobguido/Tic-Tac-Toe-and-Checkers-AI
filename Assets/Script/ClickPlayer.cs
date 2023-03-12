@@ -1,9 +1,7 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-namespace TicTacToe
+namespace General
 {
     
     public class ClickPlayer : Player
@@ -31,7 +29,7 @@ namespace TicTacToe
 
         private void Choose(Move move)
         {
-            if (GameManager.game.GetNextPlayerToPlay() == playerType)
+            if (Manager.game.GetNextPlayerToPlay() == playerType)
             {
                 choosing = false;
                 chosenMove = move;

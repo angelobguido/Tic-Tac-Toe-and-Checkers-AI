@@ -1,9 +1,8 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
+using Help;
 using UnityEngine;
 
-namespace TicTacToe
+namespace General
 {
     public abstract class Player : MonoBehaviour
     {
@@ -15,12 +14,12 @@ namespace TicTacToe
         
         protected virtual void OnEnable()
         {
-            GameManager.OnPlay += GetUnready;
+            Manager.OnPlay += GetUnready;
         }
 
         protected virtual void OnDisable()
         {
-            GameManager.OnPlay -= GetUnready;
+            Manager.OnPlay -= GetUnready;
         }
 
         public Move GetChosenMove()
@@ -33,7 +32,7 @@ namespace TicTacToe
             return isReady;
         }
 
-        private void GetUnready(PlayerType player, int row, int column)
+        private void GetUnready()
         {
             isReady = false;
         }

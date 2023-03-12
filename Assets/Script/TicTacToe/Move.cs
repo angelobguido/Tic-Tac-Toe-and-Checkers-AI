@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace TicTacToe
 {
-    public struct Move
+    public class Move : General.Move
     {
         public int row;
         public int column;
@@ -13,6 +13,11 @@ namespace TicTacToe
         {
             this.row = row;
             this.column = column;
+        }
+
+        protected override bool IsTheSameAs(General.Move other)
+        {
+            return other is Move && ((Move)other).row == row && ((Move)other).column == column;
         }
     }
     

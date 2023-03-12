@@ -324,7 +324,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1948920376504665303}
   - component: {fileID: 7344952222054961894}
-  - component: {fileID: 7204150655513026166}
+  - component: {fileID: 2438888662799545327}
   m_Layer: 0
   m_Name: TicTacToeBoard
   m_TagString: Board
@@ -384,7 +384,7 @@ MonoBehaviour:
   - {fileID: 8596156053750717085}
   firstPlayerPiece: {fileID: 11850347142699226, guid: 44a8f07832a8cc445aefa3548eac530c, type: 3}
   secondPlayerPiece: {fileID: 511120043818546503, guid: 33f2c0542c891a547a52668d2f56f0f3, type: 3}
---- !u!114 &7204150655513026166
+--- !u!114 &2438888662799545327
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -393,7 +393,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1948920376504665296}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 47276fb340139584fb0db68c637bbf22, type: 3}
+  m_Script: {fileID: 11500000, guid: cb2bd99fd4e547942a95459efd27a233, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1948920376902546730

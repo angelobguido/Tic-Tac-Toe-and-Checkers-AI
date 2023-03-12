@@ -1,46 +1,33 @@
 using System.Collections;
 using System.Collections.Generic;
+using Help;
 using UnityEngine;
 using Random = System.Random;
 
 namespace TicTacToe
 {
-    public class Game
+    public class Game: General.Game
     {
         private char[,] board;
-        private List<Move> validMoves;
-        private PlayerType nextPlayer = PlayerType.First;
-        private Move lastMove;
-        private GameState currentGameState = GameState.InProgress;
-
+        
         public Game()
         {
-            board = new char[3, 3] {{' ', ' ', ' '} , {' ', ' ', ' '}, {' ', ' ', ' '}};
-            lastMove = new Move(-1, -1);
-            InitValidMoves();
+            InitGame();
         }
 
-        public Game(Game copy)
+        public Game(General.Game copy)
         {
-            board = new char[3, 3];
-            for (var i = 0; i < 3; i++)
-            {
-                for (var j = 0; j < 3; j++)
-                {
-                    board[i, j] = copy.board[i, j];
-                }
-            }
-
-            validMoves = new List<Move>(copy.validMoves);
-            nextPlayer = copy.nextPlayer;
-            lastMove = copy.lastMove;
-            currentGameState = copy.currentGameState;
-
+            MakeCopyFrom(copy);
+        }
+        
+        public override General.Game CreateClone()
+        {
+            return new Game(this);
         }
 
-        private void InitValidMoves()
+        protected override void InitValidMoves()
         {
-            validMoves = new List<Move>();
+            validMoves = new List<General.Move>();
             
             for (var i = 0; i < 3; i++)
             {
@@ -51,37 +38,54 @@ namespace TicTacToe
             }
         }
 
-        public GameState MakeMove(Move move)
+        protected override void InitBoard()
         {
-            if (board[move.row,move.column] == 'X' || board[move.row,move.column] == 'O')
+            board = new char[3, 3] {{' ', ' ', ' '} , {' ', ' ', ' '}, {' ', ' ', ' '}};
+        }
+
+        protected override void CopyBoard(General.Game game)
+        {
+            var otherBoard = ((TicTacToe.Game)game).board;
+            board = new char[3, 3];
+            for (var i = 0; i < 3; i++)
             {
-                throw new System.Exception("Player " + ( (nextPlayer == PlayerType.First) ? 'X':'O') + " can't play at that position: " + $"({move.row}, {move.column})" );
+                for (var j = 0; j < 3; j++)
+                {
+                    board[i, j] = otherBoard[i, j];
+                }
             }
 
-            board[move.row,move.column] = GetPlayerRepresentation();
-            lastMove = move;
-            var moveIndex = validMoves.FindIndex(validMove => validMove.Equals(move));
-            validMoves.RemoveAt(moveIndex);
+        }
 
-            ChangePlayer();
+        protected override void VerifyMove(General.Move move)
+        {
+            var tttMove = (Move)move;
             
-            currentGameState = CheckGameState();
-
-            return currentGameState;
-
+            if (board[tttMove.row,tttMove.column] == 'X' || board[tttMove.row,tttMove.column] == 'O')
+            {
+                throw new System.Exception("Player " + ( (nextPlayer == PlayerType.First) ? 'X':'O') + " can't play at that position: " + $"({tttMove.row}, {tttMove.column})" );
+            }
         }
 
-        public GameState GetCurrentGameState()
+        protected override void UpdateBoard(General.Move move)
         {
-            return currentGameState;
-        }
-
-        public PlayerType GetNextPlayerToPlay()
-        {
-            return nextPlayer;
+            var tttMove = (Move)move;
+            board[tttMove.row,tttMove.column] = GetPlayerRepresentation();
         }
         
-        private GameState CheckGameState()
+        private char GetPlayerRepresentation()
+        {
+            return (nextPlayer == PlayerType.First) ? 'X' : 'O';
+        }
+
+        protected override void UpdateValidMoves()
+        {
+            var moveIndex = validMoves.FindIndex(validMove => validMove.Equals(lastMove));
+            
+            validMoves.RemoveAt(moveIndex);
+        }
+        
+        protected override GameState CheckGameState()
         {
             // Check rows for a win
             for (int row = 0; row < 3; row++)
@@ -154,34 +158,6 @@ namespace TicTacToe
 
             // If none of the above conditions are met, the game is still in progress
             return GameState.InProgress;
-        }
-        
-        private void ChangePlayer()
-        {
-            nextPlayer = (nextPlayer==PlayerType.First) ? (PlayerType.Second):(PlayerType.First);
-        }
-
-        private char GetPlayerRepresentation()
-        {
-            return (nextPlayer == PlayerType.First) ? 'X' : 'O';
-        }
-
-        public GameState MakeRandomMove()
-        {
-            var r = new Random();
-            var randomMove = validMoves[r.Next(0, validMoves.Count)];
-
-            return MakeMove(randomMove);
-        }
-
-        public Move GetLastMove()
-        {
-            return lastMove;
-        }
-
-        public List<Move> GetValidMoves()
-        {
-            return validMoves;
         }
 
     }

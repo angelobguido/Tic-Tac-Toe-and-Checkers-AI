@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using General;
+using Help;
 using UnityEngine;
 using Random = System.Random;
 
@@ -94,6 +96,7 @@ namespace Checkers
         private GameState CheckGameState()
         {
             //check checkers state
+            return currentGameState;
         }
         
         private void ChangePlayer()

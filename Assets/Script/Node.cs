@@ -1,11 +1,9 @@
-using System.Collections;
 using System.Collections.Generic;
-using Unity.Mathematics;
+using Help;
 using UnityEngine;
-using UnityEngine.AI;
 using Random = UnityEngine.Random;
 
-namespace TicTacToe
+namespace General
 {
     public class Node
     {
@@ -26,7 +24,7 @@ namespace TicTacToe
             value = 0;
             visits = 0;
 
-            this.game = new Game(game);
+            this.game = game.CreateClone();
             
             InitialiseChildren();
             
@@ -41,8 +39,8 @@ namespace TicTacToe
             this.parent = parent;
             
             this.move = move;
-            
-            this.game = new Game(game);
+
+            this.game = game.CreateClone();
             this.game.MakeMove(move);
             
             InitialiseChildren();
@@ -51,7 +49,7 @@ namespace TicTacToe
 
         public GameState GetRollout()
         {
-            var simulationGame = new Game(game);
+            var simulationGame = game.CreateClone();
 
             if (simulationGame.GetCurrentGameState() != GameState.InProgress)
                 return simulationGame.GetCurrentGameState();

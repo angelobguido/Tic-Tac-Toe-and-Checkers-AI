@@ -6,17 +6,15 @@ using UnityEngine;
 namespace TicTacToe
 {
     
-    public class CellClick : MonoBehaviour
+    public class CellClick : General.CellClick
     {
 
         [SerializeField] private int row;
         [SerializeField] private int column;
 
-        public static Action<Move> OnPositionClicked;
-        
-        public void OnClick()
+        protected override void CreateMove()
         {
-            OnPositionClicked?.Invoke(new Move(row, column));
+            move = new Move(row, column);
         }
     }   
 }

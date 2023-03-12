@@ -1,25 +1,36 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
+using Help;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace TicTacToe
+namespace General
 {
-    public class GameManager : MonoBehaviour
+    public class Manager : MonoBehaviour
     {
 
+        [SerializeField] private BoardDrawer drawer;
         [SerializeField] private Player first;
         [SerializeField] private Player second;
         [SerializeField] private int nextScene;
+        [SerializeField] private GameType gameType;
         
         public static Game game;
 
-        public static Action<PlayerType, int, int> OnPlay;
+        public static Action OnPlay;
 
         private void Awake()
         {
-            game = new Game();
+            switch (gameType)
+            {
+                case GameType.TicTacToe: game = new TicTacToe.Game();
+                    break;
+                //case GameType.Checkers: game = new Checkers.Game();
+                //    break;
+            }
+            
+            drawer.SetGame(game);
+            
         }
 
         private IEnumerator Start()
@@ -38,7 +49,7 @@ namespace TicTacToe
                 
                 game.MakeMove(move);
                 
-                OnPlay?.Invoke((player == first)?(PlayerType.First):(PlayerType.Second), move.row, move.column);
+                OnPlay?.Invoke();
 
                 var state = game.GetCurrentGameState();
                 
@@ -46,9 +57,9 @@ namespace TicTacToe
                 {
                     case GameState.Tie: Debug.Log("It's a tie!");
                         break;
-                    case GameState.PlayerOneWins: Debug.Log("Player X won!");
+                    case GameState.PlayerOneWins: Debug.Log("Player one won!");
                         break;
-                    case GameState.PlayerTwoWins: Debug.Log("Player O won!");
+                    case GameState.PlayerTwoWins: Debug.Log("Player two won!");
                         break;
                 }
                 

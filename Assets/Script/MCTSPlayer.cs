@@ -1,9 +1,6 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 
-namespace TicTacToe
+namespace General
 {
     
     public class MCTSPlayer : Player
@@ -13,19 +10,19 @@ namespace TicTacToe
         private IEnumerator Start()
         {
             yield return null;
-            mcts = new MCTS(GameManager.game, playerType);
+            mcts = new MCTS(Manager.game, playerType);
         }
 
         protected override void OnEnable()
         {
             base.OnEnable();
-            GameManager.OnPlay += UpdateMCTS;
+            Manager.OnPlay += UpdateMCTS;
         }
 
         protected override void OnDisable()
         {
             base.OnDisable();
-            GameManager.OnPlay -= UpdateMCTS;
+            Manager.OnPlay -= UpdateMCTS;
         }
 
         public override IEnumerator MakeDecision()
@@ -35,7 +32,7 @@ namespace TicTacToe
             yield return null;
         }
 
-        private void UpdateMCTS(PlayerType player, int row, int column)
+        private void UpdateMCTS()
         {
             mcts.Update();
         }

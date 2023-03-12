@@ -16,8 +16,10 @@ namespace TicTacToe
         public Node parent;
 
         public List<Node> children;
+        private Stack<Node> expandableChildren;
 
         private static readonly float RandomConstantMultiplier = 0.01f;
+        private static readonly float ExplorationConstant = 0.7f;
 
         public Node(Game game)
         {
@@ -26,8 +28,8 @@ namespace TicTacToe
 
             this.game = new Game(game);
             
-            children = new List<Node>();
-
+            InitialiseChildren();
+            
         }
         
         public Node(Node parent, Move move, Game game)
@@ -43,18 +45,17 @@ namespace TicTacToe
             this.game = new Game(game);
             this.game.MakeMove(move);
             
-            children = new List<Node>();
+            InitialiseChildren();
+            
         }
 
         public GameState GetRollout()
         {
             var simulationGame = new Game(game);
 
-            if (simulationGame.GetValidMoves().Count == 0)
-            {
+            if (simulationGame.GetCurrentGameState() != GameState.InProgress)
                 return simulationGame.GetCurrentGameState();
-            }
-            
+
             var state = simulationGame.MakeRandomMove();
 
             while (state == GameState.InProgress)
@@ -67,12 +68,12 @@ namespace TicTacToe
             return state;
         }
 
-        private float GetUCB()
+        public float GetUCB()
         {
             if (visits == 0)
                 return 1000 + Random.value * RandomConstantMultiplier;
-
-            return GetAverageValue() + Mathf.Sqrt(Mathf.Log(parent.visits))/visits + Random.value * RandomConstantMultiplier;
+            
+            return GetAverageValue() + ExplorationConstant*Mathf.Sqrt(Mathf.Log(parent.visits)/visits) + Random.value * RandomConstantMultiplier;
         }
 
         public float GetAverageValue()
@@ -89,6 +90,11 @@ namespace TicTacToe
         {
             return children.Count == 0;
         }
+
+        public bool IsExpandable()
+        {
+            return expandableChildren.Count != 0;
+        }
         
         public Node SelectNextNode()
         {
@@ -98,8 +104,22 @@ namespace TicTacToe
 
         public void Expand()
         {
+            if (expandableChildren.Count != 0)
+            {
+                children.Add(expandableChildren.Pop());
+            }
+        }
+
+        private void InitialiseChildren()
+        {
+            children = new List<Node>();
+            expandableChildren = new Stack<Node>();
+            
             var validMoves = game.GetValidMoves();
-            validMoves.ForEach( validMove => children.Add(new Node(this, validMove, game)) );
+            if (game.GetCurrentGameState() == GameState.InProgress)
+            {
+                validMoves.ForEach( validMove => expandableChildren.Push(new Node(this, validMove, game)) );    
+            }
         }
     }
     

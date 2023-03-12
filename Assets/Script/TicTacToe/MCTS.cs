@@ -20,7 +20,7 @@ namespace TicTacToe
             player = targetPlayer;
             game = currentGame;
             root = new Node(game);
-            root.Expand();
+            FindBestMove();
         }
 
         private void GetRolloutAndBackPropagate(Node node)
@@ -31,26 +31,34 @@ namespace TicTacToe
 
             switch (finalState)
             {
-                case GameState.Tie: value = 0f;
+                case GameState.Tie: 
+                    value = 0f;
                     break;
                 
-                case GameState.PlayerOneWins: value = (player == PlayerType.First) ? (1f) : (-1f);
+                case GameState.PlayerOneWins: 
+                    value = (player == PlayerType.First) ? (1f) : (-1f);
                     break;
                 
-                case GameState.PlayerTwoWins: value = (player == PlayerType.First) ? (-1f) : (1f);
+                case GameState.PlayerTwoWins: 
+                    value = (player == PlayerType.First) ? (-1f) : (1f);
                     break;
                 
             }
 
-            value *= (nextPlayerInNodeGame == player) ? (-1f) : (1f);
-            
             var currentNode = node;
+            value = (nextPlayerInNodeGame == player) ? (-value) : (value);
+            
             while (currentNode != root)
             {
+                currentNode.Visit();
                 currentNode.value += value;
                 value *= -1f;
                 currentNode = currentNode.parent;
             }
+            
+            currentNode.Visit();
+            currentNode.value += value;
+            
         }
 
         public void Update()
@@ -67,7 +75,7 @@ namespace TicTacToe
                 ProcessTree();
             
             root.children.Sort( (a,b) => b.GetAverageValue().CompareTo(a.GetAverageValue()) );
-
+            
             var bestMove = root.children[0].move;
 
             return bestMove;
@@ -78,9 +86,8 @@ namespace TicTacToe
 
             var currentNode = root;
             
-            while (!currentNode.IsLeaf())
+            while (!(currentNode.IsExpandable() || currentNode.IsLeaf()))
             {
-                currentNode.Visit();
                 currentNode = currentNode.SelectNextNode();
             }
             
@@ -88,10 +95,12 @@ namespace TicTacToe
 
             //If there are no moves left, the current node will still be a leaf, so just return
             if (currentNode.IsLeaf())
+            {
+                GetRolloutAndBackPropagate(currentNode);    
                 return;
+            }
             
             var nextNode = currentNode.SelectNextNode();
-            nextNode.Visit();
             GetRolloutAndBackPropagate(nextNode);
 
             

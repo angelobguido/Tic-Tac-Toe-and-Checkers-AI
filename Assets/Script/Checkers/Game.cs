@@ -7,64 +7,31 @@ using Random = System.Random;
 
 namespace Checkers
 {
-    public class Game
+    public class Game: General.Game
     {
-        private Piece[,] board;
-        private List<Move> validMoves;
-        private PlayerType nextPlayer = PlayerType.First;
-        private Move lastMove;
-        private GameState currentGameState = GameState.InProgress;
+        public Piece[,] board;
 
-        public Game()
+        public override General.Game CreateClone()
         {
-            InitBoard();
-            InitValidMoves();
-        }
-
-        public Game(Game copy)
-        {
-            
-            board = new Piece[8, 8];
-            for (var row = 0; row < 8; row++)
-            {
-                for (var column = 0; column < 8; column++)
-                {
-                    board[row, column] = copy.board[row, column];
-                }
-            }
-
-            validMoves = new List<Move>(copy.validMoves);
-            nextPlayer = copy.nextPlayer;
-            lastMove = copy.lastMove;
-            currentGameState = copy.currentGameState;
-
-        }
-
-        public GameState MakeMove(Move move)
-        {
-            //Make move
-            
-            //Update valid moves
-
-            ChangePlayer();
-            
-            currentGameState = CheckGameState();
-
-            return currentGameState;
-
-        }
-
-        public GameState GetCurrentGameState()
-        {
-            return currentGameState;
-        }
-
-        public PlayerType GetNextPlayerToPlay()
-        {
-            return nextPlayer;
+            return new Game(this);
         }
         
-        private void InitBoard()
+        public Game()
+        {
+            InitGame();
+        }
+
+        public Game(General.Game copy)
+        {
+            MakeCopyFrom(copy);
+        }
+
+        protected override void InitValidMoves()
+        {
+            //
+        }
+
+        protected override void InitBoard()
         {
             board = new Piece[8, 8];
             
@@ -87,93 +54,84 @@ namespace Checkers
             }
         }
 
-        private void InitValidMoves()
+        protected override void CopyBoard(General.Game game)
+        {
+            board = new Piece[8, 8];
+            var otherBoard = ((Game)game).board;
+            
+            for (var row = 0; row < 8; row++)
+            {
+                for (var column = 0; column < 8; column++)
+                {
+                    board[row, column] = otherBoard[row, column];
+                }
+            }
+        }
+
+        protected override void VerifyMove(General.Move move)
         {
             //
         }
 
-        
-        private GameState CheckGameState()
+        protected override void UpdateBoard(General.Move move)
         {
-            //check checkers state
-            return currentGameState;
-        }
-        
-        private void ChangePlayer()
-        {
-            nextPlayer = (nextPlayer==PlayerType.First) ? (PlayerType.Second):(PlayerType.First);
+            //
         }
 
-        public GameState MakeRandomMove()
-        {
-            var r = new Random();
-            var randomMove = validMoves[r.Next(0, validMoves.Count)];
-
-            return MakeMove(randomMove);
-        }
-
-        public Move GetLastMove()
-        {
-            return lastMove;
-        }
-
-        public List<Move> GetValidMoves()
-        {
-            return validMoves;
-        }
-
-        private void UpdateValidMoves()
+        protected override void UpdateValidMoves()
         {
             // Create an analyser object
             var moveAnalyser = new GameMoveAnalyser(board, nextPlayer);
             
-            // Determine the opponent's piece color
-            var opponentPiece = (nextPlayer == PlayerType.Second) ? Piece.BasicWhite : Piece.BasicBlack;
-            var opponentKing = (nextPlayer == PlayerType.Second) ? Piece.KingWhite : Piece.KingBlack;
-
             // Loop through all pieces on the board
             for (int row = 0; row < 8; row++)
             {
                 for (int col = 0; col < 8; col++)
                 {
-                    // Check if this piece belongs to the current player
                     var piece = board[row, col];
 
                     var position = new Vector2Int(row, col);
 
-                    if ((nextPlayer == PlayerType.Second && piece == Piece.BasicBlack) ||
-                        (nextPlayer == PlayerType.First && piece == Piece.BasicWhite))
+                    // Check if this piece belongs to the current player
+                    if (nextPlayer == PieceAnalyser.GetPlayerTypeFromPiece(piece))
                     {
-                        // Check if this piece can make a regular move
-                        if (moveAnalyser.CanMakeRegularMove(position))
+
+                        if (PieceAnalyser.IsKing(piece))
                         {
-                            moveAnalyser.AddRegularMoves(position);
+                            if (moveAnalyser.CanMakeKingCaptureMove(position))
+                            {
+                                moveAnalyser.AddKingCaptureMoves(position);
+                            }
+                            
+                            else if (moveAnalyser.CanMakeKingRegularMove(position))
+                            {
+                                moveAnalyser.AddKingRegularMoves(position);
+                            }
                         }
 
-                        // Check if this piece can make a capture move
-                        if (moveAnalyser.CanMakeCaptureMove(position))
+                        else
                         {
-                            moveAnalyser.AddCaptureMoves(position);
-                        }
-                    }
-                    // Check if this piece belongs to the current player and is a king
-                    else if ((nextPlayer == PlayerType.Second && piece == Piece.BasicBlack) ||
-                             (nextPlayer == PlayerType.First && piece == Piece.BasicWhite))
-                    {
-                        // Check if this king can make a regular move
-                        if (moveAnalyser.CanMakeKingRegularMove(position))
-                        {
-                            moveAnalyser.AddKingRegularMoves(position);
-                        }
-
-                        // Check if this king can make a capture move
-                        if (moveAnalyser.CanMakeKingCaptureMove(position))
-                        {
-                            moveAnalyser.AddKingCaptureMoves(position);
+                            if (moveAnalyser.CanMakeCaptureMove(position))
+                            {
+                                moveAnalyser.AddCaptureMoves(position);
+                            }
+                            
+                            else if (moveAnalyser.CanMakeRegularMove(position))
+                            {
+                                moveAnalyser.AddRegularMoves(position);
+                            }
                         }
                     }
                 }
             }
+
+            validMoves = moveAnalyser.GetAllValidMoves();
+        }
+        
+        protected override GameState CheckGameState()
+        {
+            //check checkers state
+            return GameState.InProgress;
         }
 
     }

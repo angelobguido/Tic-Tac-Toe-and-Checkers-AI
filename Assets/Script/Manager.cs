@@ -25,17 +25,18 @@ namespace General
             {
                 case GameType.TicTacToe: game = new TicTacToe.Game();
                     break;
-                //case GameType.Checkers: game = new Checkers.Game();
-                //    break;
+                case GameType.Checkers: game = new Checkers.Game();
+                    break;
             }
-            
+
             drawer.SetGame(game);
-            
+
         }
 
         private IEnumerator Start()
         {
 
+            drawer.UpdateGameDraw();
             yield return new WaitForSeconds(1f);
             Debug.Log("Game is ready!");
             

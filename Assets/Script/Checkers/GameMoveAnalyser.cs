@@ -72,8 +72,8 @@ namespace Checkers
         private Piece[,] board;
         private PlayerType nextPlayer;
         private PlayerType oponent;
-        private List<Move> captureMoves;
-        private List<Move> regularMoves;
+        private List<General.Move> captureMoves;
+        private List<General.Move> regularMoves;
 
         public GameMoveAnalyser(Piece[,] board, PlayerType nextPlayer)
         {
@@ -81,8 +81,8 @@ namespace Checkers
             this.board = board;
             this.nextPlayer = nextPlayer;
             this.oponent = (nextPlayer == PlayerType.First) ? (PlayerType.Second) : (PlayerType.First);
-            this.captureMoves = new List<Move>();
-            this.regularMoves = new List<Move>();
+            this.captureMoves = new List<General.Move>();
+            this.regularMoves = new List<General.Move>();
 
         }
 
@@ -169,6 +169,18 @@ namespace Checkers
         public void AddKingRegularMoves(Vector2Int position)
         {
             
+            foreach (Direction direction in Enum.GetValues(typeof(Direction)))
+            {
+                var directionVector = GetVectorWithDirection(direction);
+                var lookPosition = position + directionVector;
+                
+                while (CanGoTo(lookPosition))
+                {
+                    regularMoves.Add(new Move(new Step(position, lookPosition)));
+                    lookPosition += directionVector;
+                }
+                
+            }
             
         }
         
@@ -192,7 +204,7 @@ namespace Checkers
             
         }
 
-        public List<Move> GetAllValidMoves()
+        public List<General.Move> GetAllValidMoves()
         {
             return captureMoves.Count != 0 ? captureMoves : regularMoves;
         }

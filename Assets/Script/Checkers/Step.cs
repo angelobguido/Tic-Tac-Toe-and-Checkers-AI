@@ -22,7 +22,11 @@ namespace Checkers
             this.from = from;
             this.to = to;
         }
-        
+
+        public override bool Equals(object obj)
+        {
+            return obj is Step && ((Step)obj).from.Equals(from) && ((Step)obj).to.Equals(to);
+        }
     }
 
     

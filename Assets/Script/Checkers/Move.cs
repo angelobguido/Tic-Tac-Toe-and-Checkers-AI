@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Checkers
 {
-    public class Move
+    public class Move: General.Move
     {
         private List<Step> steps;
 
@@ -15,8 +15,22 @@ namespace Checkers
 
         public Move(Step step)
         {
-            steps = new List<Step>();
-            steps.Add(step);
+            steps = new List<Step> { step };
+        }
+
+        protected override bool IsTheSameAs(General.Move other)
+        {
+            if (other is not Move)
+                return false;
+
+            for (var i = 0; i < steps.Count; i++)
+            {
+                if (!steps[i].Equals(((Move)other).steps[i]))
+                    return false;
+            }
+
+            return true;
+
         }
     }
     

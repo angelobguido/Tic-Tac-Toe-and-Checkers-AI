@@ -5,21 +5,6 @@ using Help;
 using UnityEngine;
 using UnityEngine.Animations;
 
-public class Piece : MonoBehaviour
-{
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-}
-
 namespace Checkers
 {
     public enum Piece: byte

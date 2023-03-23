@@ -7,7 +7,8 @@ namespace Help
     public enum PlayerType: byte
     {
         First, //X
-        Second //O
+        Second,//O
+        NullPlayer
     }
 
     public enum GameState: byte

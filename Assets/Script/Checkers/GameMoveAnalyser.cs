@@ -17,63 +17,14 @@ namespace Checkers
         DownLeft
     }
 
-    public class CaptureStorage
-    {
-
-        public byte[,] positionsCaptured;
-        public int numberOfCaptures;
-
-        public CaptureStorage()
-        {
-            positionsCaptured = new byte[8, 8];
-            for (var row = 0; row < 8; row++)
-            {
-                for (var column = 0; column < 8; column++)
-                {
-                    positionsCaptured[row, column] = 0;
-                }
-            }
-
-            numberOfCaptures = 0;
-        }
-
-        public CaptureStorage(CaptureStorage origin)
-        {
-            positionsCaptured = new byte[8, 8];
-            
-            for (var row = 0; row < 8; row++)
-            {
-                for (var column = 0; column < 8; column++)
-                {
-                    positionsCaptured[row, column] = origin.positionsCaptured[row, column];
-                }
-            }
-
-            numberOfCaptures = origin.numberOfCaptures;
-
-        }
-
-        public void AddCapturedPosition(Vector2Int position)
-        {
-            positionsCaptured[position.x, position.y] = 1;
-            numberOfCaptures++;
-        }
-
-        public bool IsCaptured(Vector2Int position)
-        {
-            return positionsCaptured[position.x, position.y] == 1;
-        }
-
-    }
-    
     public class GameMoveAnalyser
     {
 
         private Piece[,] board;
         private PlayerType nextPlayer;
         private PlayerType oponent;
-        private List<General.Move> captureMoves;
-        private List<General.Move> regularMoves;
+        private List<Move > captureMoves;
+        private List<Move> regularMoves;
 
         public GameMoveAnalyser(Piece[,] board, PlayerType nextPlayer)
         {
@@ -81,8 +32,8 @@ namespace Checkers
             this.board = board;
             this.nextPlayer = nextPlayer;
             this.oponent = (nextPlayer == PlayerType.First) ? (PlayerType.Second) : (PlayerType.First);
-            this.captureMoves = new List<General.Move>();
-            this.regularMoves = new List<General.Move>();
+            this.captureMoves = new List<Move>();
+            this.regularMoves = new List<Move>();
 
         }
 
@@ -140,13 +91,36 @@ namespace Checkers
         public void AddCaptureMoves(Vector2Int position)
         {
             var captures = new CaptureStorage();
-            var movesWithCaptures = new List< Pair<CaptureStorage, Move> >();
+            var moves = new List<Move>();
             var stepsHistory = new List<Step>();
             
-            _AddCaptureMoves(movesWithCaptures, captures, stepsHistory, position);
+            _AddCaptureMoves(moves, captures, stepsHistory, position);
             
             //SORT MOVES. then add the ones that have the most number of captures.
+            moves.Sort((a, b) => b.captures.numberOfCaptures.CompareTo(a.captures.numberOfCaptures));
 
+            var maxCaptures = moves[0].captures.numberOfCaptures;
+
+            if (captureMoves.Exists((a) => (a.captures.numberOfCaptures > maxCaptures)))
+                return;
+
+            if (captureMoves.Exists((a) => (a.captures.numberOfCaptures == maxCaptures)))
+            {
+                moves.ForEach( (a) =>
+                {
+                    if(a.captures.numberOfCaptures == maxCaptures)
+                        captureMoves.Add(a);
+                });
+                
+                return;
+            }
+            
+            captureMoves.Clear();
+            moves.ForEach( (a) =>
+            {
+                if(a.captures.numberOfCaptures == maxCaptures)
+                    captureMoves.Add(a);
+            });
 
         }
         
@@ -206,7 +180,17 @@ namespace Checkers
 
         public List<General.Move> GetAllValidMoves()
         {
-            return captureMoves.Count != 0 ? captureMoves : regularMoves;
+            var validMoves = new List<General.Move>();
+            if (captureMoves.Count != 0)
+            {
+                captureMoves.ForEach( (a) => validMoves.Add(a) );
+            }
+            else
+            {
+                regularMoves.ForEach( (a)=> validMoves.Add(a));
+            }
+
+            return validMoves;
         }
 
         private bool CanGoTo(Vector2Int position)
@@ -249,7 +233,7 @@ namespace Checkers
             return directionVector;
         }
 
-        private void _AddCaptureMoves(List< Pair<CaptureStorage, Move> > movesWithCaptures, CaptureStorage captures, List<Step> stepsHistory, Vector2Int lastPosition)
+        private void _AddCaptureMoves(List< Move > moves, CaptureStorage captures, List<Step> stepsHistory, Vector2Int lastPosition)
         {
             var capturedSomething = false;
             
@@ -269,7 +253,7 @@ namespace Checkers
                         if (CanGoTo(nextLookPosition))
                         {
                             stepsHistory.Add(new Step(lookPosition, nextLookPosition));
-                            _AddCaptureMoves( movesWithCaptures, new(captures), new(stepsHistory), nextLookPosition );
+                            _AddCaptureMoves( moves, new(captures), new(stepsHistory), nextLookPosition );
                         }
                     }
                     
@@ -279,8 +263,10 @@ namespace Checkers
 
             if (!capturedSomething)
             {
-                var move = new Move(stepsHistory);
-                movesWithCaptures.Add(new Pair<CaptureStorage, Move>( captures, move ));
+                var bigStep = new Step(stepsHistory[0].from, stepsHistory[^1].to);
+                var move = new Move(bigStep);
+                move.captures = captures;
+                moves.Add(move);
             }
         }
         

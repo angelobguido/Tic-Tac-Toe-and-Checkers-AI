@@ -28,7 +28,7 @@ namespace Checkers
 
         protected override void InitValidMoves()
         {
-            //
+            UpdateValidMoves();
         }
 
         protected override void InitBoard()
@@ -70,12 +70,23 @@ namespace Checkers
 
         protected override void VerifyMove(General.Move move)
         {
-            //
+            var cMove = (Move)move;
+            
+            if (!validMoves.Exists( (a) => a.Equals(cMove) ))
+            {
+                throw new System.Exception("Player " + ( (nextPlayer == PlayerType.First) ? "White":"Black") + " can't play at that position" );
+            }
         }
 
         protected override void UpdateBoard(General.Move move)
         {
-            //
+            var cMove = (Move)move;
+            var piece = board[cMove.step.from.x, cMove.step.from.y];
+            board[cMove.step.from.x, cMove.step.from.y] = Piece.Nothing;
+
+            cMove.captures?.capturesPositions.ForEach( (a) => board[a.x,a.y] = Piece.Nothing );
+
+            board[cMove.step.to.x, cMove.step.to.y] = piece;
         }
 
         protected override void UpdateValidMoves()
@@ -95,7 +106,6 @@ namespace Checkers
                     // Check if this piece belongs to the current player
                     if (nextPlayer == PieceAnalyser.GetPlayerTypeFromPiece(piece))
                     {
-
                         if (PieceAnalyser.IsKing(piece))
                         {
                             if (moveAnalyser.CanMakeKingCaptureMove(position))

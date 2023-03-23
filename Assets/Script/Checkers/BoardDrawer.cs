@@ -46,7 +46,6 @@ namespace Checkers
                     {
                         case Piece.BasicBlack:
                             var obj = Instantiate(blackPiece, positionMap[row, column].position, Quaternion.identity).transform;
-                            Debug.Log(obj);
                             obj.SetParent(pieces);
                             
                             break;

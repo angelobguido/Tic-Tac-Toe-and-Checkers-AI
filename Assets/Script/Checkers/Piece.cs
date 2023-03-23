@@ -20,6 +20,8 @@ namespace Checkers
     {
         public static PlayerType GetPlayerTypeFromPiece(Piece piece)
         {
+            if (piece is Piece.Nothing)
+                return PlayerType.NullPlayer;
             return piece is Piece.BasicBlack or Piece.KingBlack ? PlayerType.Second : PlayerType.First;
         }
 

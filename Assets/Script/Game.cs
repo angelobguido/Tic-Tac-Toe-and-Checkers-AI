@@ -38,10 +38,9 @@ namespace General
             
             lastMove = move;
             
-            UpdateValidMoves();
-            
             ChangePlayer();
-            
+            UpdateValidMoves();
+
             currentGameState = CheckGameState();
 
             return currentGameState;

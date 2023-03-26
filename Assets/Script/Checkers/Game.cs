@@ -86,7 +86,22 @@ namespace Checkers
 
             cMove.captures?.capturesPositions.ForEach( (a) => board[a.x,a.y] = Piece.Nothing );
 
-            board[cMove.step.to.x, cMove.step.to.y] = piece;
+            if (IsPromotionPosition(cMove.step.to, piece))
+            {
+                board[cMove.step.to.x, cMove.step.to.y] = (PieceAnalyser.GetPlayerTypeFromPiece(piece) == PlayerType.First) ? (Piece.KingWhite) : (Piece.KingBlack);    
+            }
+            else
+            {
+                board[cMove.step.to.x, cMove.step.to.y] = piece;
+            }
+            
+        }
+
+        private bool IsPromotionPosition(Vector2Int position, Piece piece)
+        {
+            var finalRow = (PieceAnalyser.GetPlayerTypeFromPiece(piece) == PlayerType.First) ? 0 : 7;
+
+            return finalRow == position.x;
         }
 
         protected override void UpdateValidMoves()

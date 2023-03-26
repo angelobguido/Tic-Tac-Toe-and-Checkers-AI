@@ -79,8 +79,10 @@ namespace Checkers
             
             foreach (Direction direction in Enum.GetValues(typeof(Direction)))
             {
-                var lookPosition = position + GetVectorWithDirection(direction);
-                if (CanCaptureAt(lookPosition))
+                var directionVector = GetVectorWithDirection(direction);
+                var lookPosition = position + directionVector;
+                
+                if (CanCaptureAt(lookPosition, directionVector))
                     return true;
             }
             
@@ -92,35 +94,10 @@ namespace Checkers
         {
             var captures = new CaptureStorage();
             var moves = new List<Move>();
-            var stepsHistory = new List<Step>();
-            
-            _AddCaptureMoves(moves, captures, stepsHistory, position);
-            
-            //SORT MOVES. then add the ones that have the most number of captures.
-            moves.Sort((a, b) => b.captures.numberOfCaptures.CompareTo(a.captures.numberOfCaptures));
+           
+            _AddCaptureMoves(moves, captures, ref position, position);
 
-            var maxCaptures = moves[0].captures.numberOfCaptures;
-
-            if (captureMoves.Exists((a) => (a.captures.numberOfCaptures > maxCaptures)))
-                return;
-
-            if (captureMoves.Exists((a) => (a.captures.numberOfCaptures == maxCaptures)))
-            {
-                moves.ForEach( (a) =>
-                {
-                    if(a.captures.numberOfCaptures == maxCaptures)
-                        captureMoves.Add(a);
-                });
-                
-                return;
-            }
-            
-            captureMoves.Clear();
-            moves.ForEach( (a) =>
-            {
-                if(a.captures.numberOfCaptures == maxCaptures)
-                    captureMoves.Add(a);
-            });
+            AddGeneralCaptureMoves(moves);
 
         }
         
@@ -164,7 +141,7 @@ namespace Checkers
             foreach (Direction direction in Enum.GetValues(typeof(Direction)))
             {
                 var lookPosition = FindFirstPiecePositionAt(direction, position);
-                if (CanCaptureAt(lookPosition))
+                if (CanCaptureAt(lookPosition, GetVectorWithDirection(direction)))
                     return true;
             }
             
@@ -174,8 +151,13 @@ namespace Checkers
             
         public void AddKingCaptureMoves(Vector2Int position)
         {
+            var captures = new CaptureStorage();
+            var moves = new List<Move>();
             
-            
+            _AddKingCaptureMoves(moves, captures, ref position, position);
+
+            AddGeneralCaptureMoves(moves);
+
         }
 
         public List<General.Move> GetAllValidMoves()
@@ -198,11 +180,17 @@ namespace Checkers
             return PieceAnalyser.IsValid(position) && (board[position.x, position.y] == Piece.Nothing);
         }
 
-        private bool CanCaptureAt(Vector2Int position)
+        private bool CanCaptureAt(Vector2Int position, Vector2Int direction)
         {
-            return PieceAnalyser.IsValid(position) &&
-                   (PieceAnalyser.GetPlayerTypeFromPiece(board[position.x, position.y]) == oponent) &&
-                   CanMakeKingRegularMove(position);
+
+            if (!(PieceAnalyser.IsValid(position) &&
+                (PieceAnalyser.GetPlayerTypeFromPiece(board[position.x, position.y]) == oponent)))
+                return false;
+
+            var nextPosition = position + direction;
+
+            return PieceAnalyser.IsValid(nextPosition) &&
+                   PieceAnalyser.GetPlayerTypeFromPiece(board[nextPosition.x, nextPosition.y]) == PlayerType.NullPlayer;
         }
 
         private Vector2Int FindFirstPiecePositionAt(Direction direction, Vector2Int from)
@@ -233,41 +221,99 @@ namespace Checkers
             return directionVector;
         }
 
-        private void _AddCaptureMoves(List< Move > moves, CaptureStorage captures, List<Step> stepsHistory, Vector2Int lastPosition)
+        private void _AddCaptureMoves(List< Move > moves, CaptureStorage captures, ref Vector2Int firstPosition, Vector2Int lastPosition)
         {
             var capturedSomething = false;
             
             foreach (Direction direction in Enum.GetValues(typeof(Direction)))
             {
-                var lookPosition = lastPosition + GetVectorWithDirection(direction);
-                if (CanCaptureAt(lookPosition) && !captures.IsCaptured(lookPosition))
+                var directionVector = GetVectorWithDirection(direction);
+                var lookPosition = lastPosition + directionVector;
+                
+                if (CanCaptureAt(lookPosition, directionVector) && !captures.IsCaptured(lookPosition))
                 {
                     capturedSomething = true;
                     
                     captures.AddCapturedPosition(lookPosition);
-                    stepsHistory.Add(new Step(lastPosition, lookPosition));
-
-                    foreach (Direction nextDirection in Enum.GetValues(typeof(Direction)))
-                    {
-                        var nextLookPosition = lookPosition + GetVectorWithDirection(nextDirection);
-                        if (CanGoTo(nextLookPosition))
-                        {
-                            stepsHistory.Add(new Step(lookPosition, nextLookPosition));
-                            _AddCaptureMoves( moves, new(captures), new(stepsHistory), nextLookPosition );
-                        }
-                    }
                     
+                    var nextLookPosition = lookPosition + directionVector;
+                    _AddCaptureMoves( moves, new(captures), ref firstPosition, nextLookPosition );
                 }
                    
             }
 
             if (!capturedSomething)
             {
-                var bigStep = new Step(stepsHistory[0].from, stepsHistory[^1].to);
+                var bigStep = new Step(firstPosition, lastPosition);
                 var move = new Move(bigStep);
                 move.captures = captures;
                 moves.Add(move);
             }
+        }
+        
+        private void _AddKingCaptureMoves(List< Move > moves, CaptureStorage captures, ref Vector2Int firstPosition, Vector2Int lastPosition)
+        {
+            var capturedSomething = false;
+            
+            foreach (Direction direction in Enum.GetValues(typeof(Direction)))
+            {
+                var directionVector = GetVectorWithDirection(direction);
+                var lookPosition = FindFirstPiecePositionAt(direction, lastPosition);
+                
+                if (CanCaptureAt(lookPosition, directionVector) && !captures.IsCaptured(lookPosition))
+                {
+                    capturedSomething = true;
+                    
+                    captures.AddCapturedPosition(lookPosition);
+                    
+                    var nextLookPosition = lookPosition + directionVector;
+
+                    while (CanGoTo(nextLookPosition))
+                    {
+                        _AddKingCaptureMoves( moves, new(captures), ref firstPosition, nextLookPosition );
+                        
+                        nextLookPosition += directionVector;
+                    }
+                }
+                   
+            }
+
+            if (!capturedSomething)
+            {
+                var bigStep = new Step(firstPosition, lastPosition);
+                var move = new Move(bigStep);
+                move.captures = captures;
+                moves.Add(move);
+            }
+        }
+
+        private void AddGeneralCaptureMoves(List<Move> moves)
+        {
+            //SORT MOVES. then add the ones that have the most number of captures.
+            moves.Sort((a, b) => b.captures.numberOfCaptures.CompareTo(a.captures.numberOfCaptures));
+
+            var maxCaptures = moves[0].captures.numberOfCaptures;
+
+            if (captureMoves.Exists((a) => (a.captures.numberOfCaptures > maxCaptures)))
+                return;
+
+            if (captureMoves.Exists((a) => (a.captures.numberOfCaptures == maxCaptures)))
+            {
+                moves.ForEach( (a) =>
+                {
+                    if(a.captures.numberOfCaptures == maxCaptures)
+                        captureMoves.Add(a);
+                });
+                
+                return;
+            }
+            
+            captureMoves.Clear();
+            moves.ForEach( (a) =>
+            {
+                if(a.captures.numberOfCaptures == maxCaptures)
+                    captureMoves.Add(a);
+            });
         }
         
 

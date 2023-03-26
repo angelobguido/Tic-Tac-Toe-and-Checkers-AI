@@ -34,6 +34,7 @@ namespace Checkers
         {
             return position.x is >= 0 and <= 7 && position.y is >= 0 and <= 7;
         }
+    
     }
     
     

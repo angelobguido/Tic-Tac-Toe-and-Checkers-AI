@@ -10,6 +10,7 @@ namespace Checkers
     public class Game: General.Game
     {
         public Piece[,] board;
+        private int numberOfNoCaptures = 0;
 
         public override General.Game CreateClone()
         {
@@ -23,6 +24,7 @@ namespace Checkers
 
         public Game(General.Game copy)
         {
+            numberOfNoCaptures = ((Checkers.Game)copy).numberOfNoCaptures;
             MakeCopyFrom(copy);
         }
 
@@ -85,6 +87,15 @@ namespace Checkers
             board[cMove.step.from.x, cMove.step.from.y] = Piece.Nothing;
 
             cMove.captures?.capturesPositions.ForEach( (a) => board[a.x,a.y] = Piece.Nothing );
+
+            if (cMove.captures == null)
+            {
+                numberOfNoCaptures++;
+            }
+            else
+            {
+                numberOfNoCaptures = 0;
+            }
 
             if (IsPromotionPosition(cMove.step.to, piece))
             {
@@ -155,7 +166,12 @@ namespace Checkers
         
         protected override GameState CheckGameState()
         {
-            //check checkers state
+            if(validMoves.Count == 0)
+                return (nextPlayer==PlayerType.First)?(GameState.PlayerTwoWins):(GameState.PlayerOneWins);
+
+            if (numberOfNoCaptures == 40)
+                return GameState.Tie;
+            
             return GameState.InProgress;
         }
 

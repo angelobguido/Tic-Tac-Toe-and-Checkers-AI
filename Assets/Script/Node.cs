@@ -15,8 +15,8 @@ namespace General
 
         public List<Node> children;
         private Stack<Node> expandableChildren;
+        private Stack<Move> remainingMoves;
 
-        private static readonly float RandomConstantMultiplier = 0.01f;
         private static readonly float ExplorationConstant = 0.7f;
 
         public Node(Game game)
@@ -26,8 +26,7 @@ namespace General
 
             this.game = game.CreateClone();
             
-            InitialiseChildren();
-            
+            InitialiseNode();
         }
         
         public Node(Node parent, Move move, Game game)
@@ -43,7 +42,7 @@ namespace General
             this.game = game.CreateClone();
             this.game.MakeMove(move);
             
-            InitialiseChildren();
+            InitialiseNode();
             
         }
 
@@ -69,9 +68,9 @@ namespace General
         public float GetUCB()
         {
             if (visits == 0)
-                return 1000 + Random.value * RandomConstantMultiplier;
+                return 1000;
             
-            return GetAverageValue() + ExplorationConstant*Mathf.Sqrt(Mathf.Log(parent.visits)/visits) + Random.value * RandomConstantMultiplier;
+            return GetAverageValue() + ExplorationConstant*Mathf.Sqrt(Mathf.Log(parent.visits)/visits);
         }
 
         public float GetAverageValue()
@@ -91,7 +90,7 @@ namespace General
 
         public bool IsExpandable()
         {
-            return expandableChildren.Count != 0;
+            return remainingMoves.Count != 0;
         }
         
         public Node SelectNextNode()
@@ -102,22 +101,16 @@ namespace General
 
         public void Expand()
         {
-            if (expandableChildren.Count != 0)
+            if (IsExpandable())
             {
-                children.Add(expandableChildren.Pop());
+                children.Add(new Node(this, remainingMoves.Pop(), game));
             }
         }
 
-        private void InitialiseChildren()
+        private void InitialiseNode()
         {
             children = new List<Node>();
-            expandableChildren = new Stack<Node>();
-            
-            var validMoves = game.GetValidMoves();
-            if (game.GetCurrentGameState() == GameState.InProgress)
-            {
-                validMoves.ForEach( validMove => expandableChildren.Push(new Node(this, validMove, game)) );    
-            }
+            remainingMoves = game.GetCurrentGameState() == GameState.InProgress ? new Stack<Move>(game.GetValidMoves()) : new Stack<Move>();
         }
     }
     

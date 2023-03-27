@@ -24,7 +24,6 @@ namespace General
 
         public Move GetChosenMove()
         {
-            Debug.Log(playerType+" is playing");
             return chosenMove;
         }
 

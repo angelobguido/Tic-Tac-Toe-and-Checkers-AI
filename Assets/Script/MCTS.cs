@@ -1,4 +1,5 @@
 using Help;
+using UnityEngine;
 
 namespace General
 {
@@ -15,7 +16,7 @@ namespace General
             player = targetPlayer;
             game = currentGame;
             root = new Node(game);
-            FindBestMove();
+            
         }
 
         private void GetRolloutAndBackPropagate(Node node)
@@ -59,8 +60,8 @@ namespace General
         public void Update()
         {
             var lastMove = game.GetLastMove();
-            var newRoot = root.children.Find(node => node.move.Equals(lastMove));
-            
+            var newRoot = root.children.Find(node => node.move.Equals(lastMove)) ?? new Node(game);
+
             root = newRoot;
         }
 

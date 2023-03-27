@@ -22,24 +22,7 @@ namespace General
         private void GetRolloutAndBackPropagate(Node node)
         {
             var nextPlayerInNodeGame = node.game.GetNextPlayerToPlay();
-            var finalState = node.GetRollout();
-            float value = 0f;
-
-            switch (finalState)
-            {
-                case GameState.Tie: 
-                    value = 0f;
-                    break;
-                
-                case GameState.PlayerOneWins: 
-                    value = (player == PlayerType.First) ? (1f) : (-1f);
-                    break;
-                
-                case GameState.PlayerTwoWins: 
-                    value = (player == PlayerType.First) ? (-1f) : (1f);
-                    break;
-                
-            }
+            var value = node.GetRollout(player);
 
             var currentNode = node;
             value = (nextPlayerInNodeGame == player) ? (-value) : (value);

@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using Help;
+using Unity.Collections;
+using Unity.Jobs;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -18,6 +20,8 @@ namespace General
         private Stack<Move> remainingMoves;
 
         private static readonly float ExplorationConstant = 0.7f;
+        
+        private static readonly int NumberOfParallelSimulations = 10;
 
         public Node(Game game)
         {
@@ -46,23 +50,38 @@ namespace General
             
         }
 
-        public GameState GetRollout()
+        public float GetRollout(PlayerType mctsPlayer)
         {
             var simulationGame = game.CreateClone();
+            GameState state;
 
             if (simulationGame.GetCurrentGameState() != GameState.InProgress)
-                return simulationGame.GetCurrentGameState();
+                return MCTSLeafJob.GetRewardFromState(simulationGame.GetCurrentGameState(), mctsPlayer);
 
-            var state = simulationGame.MakeRandomMove();
 
-            while (state == GameState.InProgress)
+            var result = new NativeArray<float>(NumberOfParallelSimulations, Allocator.TempJob);
+            var leafJob = new MCTSLeafJob();
+            leafJob.game = game;
+            leafJob.player = mctsPlayer;
+            leafJob.result = result;
+
+            var handle = leafJob.Schedule(result.Length, 1);
+            handle.Complete();
+
+            var rewardAverage = 0f;
+            
+            foreach (var reward in result)
             {
-                state = simulationGame.MakeRandomMove();
+                rewardAverage += reward;
             }
 
-            simulationGame = null;
+            rewardAverage /= NumberOfParallelSimulations;
 
-            return state;
+            result.Dispose();
+
+            return rewardAverage;
+        
+
         }
 
         public float GetUCB()

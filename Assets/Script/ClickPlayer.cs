@@ -11,13 +11,13 @@ namespace General
         protected override void OnEnable()
         {
             base.OnEnable();
-            CellClick.OnPositionClicked += Choose;
+            ClickManager.OnMoveMade += Choose;
         }
 
         protected override void OnDisable()
         {
             base.OnDisable();
-            CellClick.OnPositionClicked -= Choose;
+            ClickManager.OnMoveMade -= Choose;
         }
 
         public override IEnumerator MakeDecision()

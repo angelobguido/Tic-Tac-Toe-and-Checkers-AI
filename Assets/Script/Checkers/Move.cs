@@ -70,6 +70,12 @@ namespace Checkers
         public Step step;
         public CaptureStorage captures;
 
+        
+        public Move()
+        {
+            
+        }
+        
         public Move(Step step)
         {
             this.step = step;

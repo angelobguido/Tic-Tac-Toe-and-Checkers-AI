@@ -223,8 +223,6 @@ namespace Checkers
 
         private void _AddCaptureMoves(List< Move > moves, CaptureStorage captures, ref Vector2Int firstPosition, Vector2Int lastPosition)
         {
-            var capturedSomething = false;
-            
             foreach (Direction direction in Enum.GetValues(typeof(Direction)))
             {
                 var directionVector = GetVectorWithDirection(direction);
@@ -232,29 +230,25 @@ namespace Checkers
                 
                 if (CanCaptureAt(lookPosition, directionVector) && !captures.IsCaptured(lookPosition))
                 {
-                    capturedSomething = true;
-                    
                     captures.AddCapturedPosition(lookPosition);
                     
                     var nextLookPosition = lookPosition + directionVector;
                     _AddCaptureMoves( moves, new(captures), ref firstPosition, nextLookPosition );
+                    return;
                 }
-                   
+
             }
 
-            if (!capturedSomething)
-            {
-                var bigStep = new Step(firstPosition, lastPosition);
-                var move = new Move(bigStep);
-                move.captures = captures;
-                moves.Add(move);
-            }
+            
+            var bigStep = new Step(firstPosition, lastPosition);
+            var move = new Move(bigStep);
+            move.captures = captures;
+            moves.Add(move);
+        
         }
         
         private void _AddKingCaptureMoves(List< Move > moves, CaptureStorage captures, ref Vector2Int firstPosition, Vector2Int lastPosition)
         {
-            var capturedSomething = false;
-            
             foreach (Direction direction in Enum.GetValues(typeof(Direction)))
             {
                 var directionVector = GetVectorWithDirection(direction);
@@ -262,8 +256,6 @@ namespace Checkers
                 
                 if (CanCaptureAt(lookPosition, directionVector) && !captures.IsCaptured(lookPosition))
                 {
-                    capturedSomething = true;
-                    
                     captures.AddCapturedPosition(lookPosition);
                     
                     var nextLookPosition = lookPosition + directionVector;
@@ -274,17 +266,17 @@ namespace Checkers
                         
                         nextLookPosition += directionVector;
                     }
+
+                    return;
                 }
                    
             }
 
-            if (!capturedSomething)
-            {
-                var bigStep = new Step(firstPosition, lastPosition);
-                var move = new Move(bigStep);
-                move.captures = captures;
-                moves.Add(move);
-            }
+            var bigStep = new Step(firstPosition, lastPosition);
+            var move = new Move(bigStep);
+            move.captures = captures;
+            moves.Add(move);
+
         }
 
         private void AddGeneralCaptureMoves(List<Move> moves)

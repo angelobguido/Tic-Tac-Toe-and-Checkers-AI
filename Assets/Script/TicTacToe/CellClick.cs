@@ -16,7 +16,6 @@ namespace TicTacToe
         
         public override void OnClick()
         {
-            Debug.Log("Clicked");
             OnPositionClicked?.Invoke(new Move(row, column));
         }
         

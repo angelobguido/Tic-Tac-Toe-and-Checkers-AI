@@ -62,6 +62,13 @@ namespace Checkers
             return obj is CaptureStorage && ((CaptureStorage)obj).capturesPositions.SequenceEqual(capturesPositions);
         }
 
+        public string CapturesToString()
+        {
+            var capturesString = "";
+            capturesPositions.ForEach( (a) => capturesString+=a);
+            return capturesString;
+        }
+
     }
     
     
@@ -95,6 +102,11 @@ namespace Checkers
 
             return captures.Equals(((Move)other).captures);
 
+        }
+
+        public string MoveToString()
+        {
+            return "(" + step.from + "," + step.to + ")" + "\n" + captures?.CapturesToString();
         }
     }
     

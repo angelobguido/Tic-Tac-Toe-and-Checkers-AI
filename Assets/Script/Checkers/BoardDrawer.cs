@@ -64,7 +64,7 @@ namespace Checkers
                     }
                 }
             }
-            
+
         }
 
         private void ClearAll()

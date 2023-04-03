@@ -90,8 +90,6 @@ namespace Checkers
                 move.captures = captures;
             }
             
-            Debug.Log(step.from+" "+step.to);
-            
             if (IsValid(move))
             {
                 TransmitMovement(move);

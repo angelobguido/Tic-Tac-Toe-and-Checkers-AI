@@ -8,13 +8,16 @@ namespace TicTacToe
     
     public class CellClick : General.CellClick
     {
+        
+        public static Action<Move> OnPositionClicked;
 
         [SerializeField] private int row;
         [SerializeField] private int column;
-
-        protected override void CreateMove()
+        
+        public override void OnClick()
         {
-            move = new Move(row, column);
+            OnPositionClicked?.Invoke(new Move(row, column));
         }
+        
     }   
 }

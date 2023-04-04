@@ -49,6 +49,13 @@ namespace General
                 var move = player.GetChosenMove();
                 
                 game.MakeMove(move);
+
+                if (gameType == GameType.Checkers)
+                {
+
+                    var cMove = (Checkers.Move)game.GetLastMove();
+                    Debug.Log(cMove.MoveToString());
+                }
                 
                 OnPlay?.Invoke();
 

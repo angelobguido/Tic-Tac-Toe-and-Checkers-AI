@@ -6,20 +6,7 @@ namespace General
     
     public abstract class CellClick : MonoBehaviour
     {
+        public abstract void OnClick();
 
-        protected Move move;
-        public static Action<Move> OnPositionClicked;
-
-        private void Awake()
-        {
-            CreateMove();
-        }
-
-        public void OnClick()
-        {
-            OnPositionClicked?.Invoke(move);
-        }
-        
-        protected abstract void CreateMove();
     }   
 }

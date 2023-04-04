@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Help;
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
@@ -9,22 +10,38 @@ using UnityEngine;
 
 namespace General
 {
-    
+    [BurstCompile]
     public struct MCTSLeafJob : IJobParallelFor
     {
         public NativeArray<float> result;
-        public NativeArray<Game> game;
+        
+        [ReadOnly]
+        public NativeArray<Checkers.Piece> checkersBoard;
+        [ReadOnly]
+        public NativeArray<char> tictactoeBoard;
+        
         public PlayerType player;
+        public GameType gameType;
 
         public void Execute(int i)
         {
-            var simulationGame = game.CreateClone();
+            Game game = new TicTacToe.Game();
+            switch (gameType)
+            {
+                case GameType.Checkers:
+                    game = new Checkers.Game(checkersBoard, player);
+                    break;
+                
+                case GameType.TicTacToe:
+                    game = new TicTacToe.Game(tictactoeBoard, player);
+                    break;
+            }
             
-            var state = simulationGame.MakeRandomMove();
+            var state = game.MakeRandomMove();
 
             while (state == GameState.InProgress)
             {
-                state = simulationGame.MakeRandomMove();
+                state = game.MakeRandomMove();
             }
             
             result[i] = GetRewardFromState(state, player);

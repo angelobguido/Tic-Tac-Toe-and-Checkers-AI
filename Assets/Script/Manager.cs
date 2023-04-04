@@ -13,7 +13,7 @@ namespace General
         [SerializeField] private Player first;
         [SerializeField] private Player second;
         [SerializeField] private int nextScene;
-        [SerializeField] private GameType gameType;
+        [SerializeField] public static GameType gameType;
         
         public static Game game;
 

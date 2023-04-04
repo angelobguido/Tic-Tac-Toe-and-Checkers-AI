@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Help;
+using Unity.Collections;
 using UnityEngine;
 using Random = System.Random;
 
@@ -8,7 +9,24 @@ namespace TicTacToe
 {
     public class Game: General.Game
     {
-        private char[,] board;
+        public char[,] board;
+
+        public Game(NativeArray<char> boardArray, PlayerType player)
+        {
+            board = new char[3, 3];
+            var i = 0;
+            for (var row = 0; row < 3; row++)
+            {
+                for (var column = 0; column < 3; column++)
+                {
+                    board[row, column] = boardArray[i];
+                    i++;
+                }
+            }
+
+            this.nextPlayer = player;
+            UpdateValidMoves();
+        }
         
         public Game()
         {
@@ -80,9 +98,17 @@ namespace TicTacToe
 
         protected override void UpdateValidMoves()
         {
-            var moveIndex = validMoves.FindIndex(validMove => validMove.Equals(lastMove));
+            validMoves.Clear();
+            for (var row = 0; row < 3; row++)
+            {
+                for (var column = 0; column < 3; column++)
+                {
+                    if(board[row, column] is not 'X' or 'O')
+                        validMoves.Add(new Move(row, column));
+                    
+                }
+            }
             
-            validMoves.RemoveAt(moveIndex);
         }
         
         protected override GameState CheckGameState()

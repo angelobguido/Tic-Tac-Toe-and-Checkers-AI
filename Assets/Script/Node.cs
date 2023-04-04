@@ -3,6 +3,7 @@ using Help;
 using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
+using Piece = Checkers.Piece;
 using Random = UnityEngine.Random;
 
 namespace General
@@ -21,7 +22,7 @@ namespace General
 
         private static readonly float ExplorationConstant = 0.7f;
         
-        private static readonly int NumberOfParallelSimulations = 10;
+        private static readonly int NumberOfParallelSimulations = 2;
 
         public Node(Game game)
         {
@@ -61,9 +62,36 @@ namespace General
 
             var result = new NativeArray<float>(NumberOfParallelSimulations, Allocator.TempJob);
             var leafJob = new MCTSLeafJob();
-            leafJob.game = game;
             leafJob.player = mctsPlayer;
             leafJob.result = result;
+            leafJob.gameType = Manager.gameType;
+
+            var i = 0;
+            switch (Manager.gameType)
+            {
+                case GameType.Checkers:
+                    
+                    leafJob.checkersBoard = new NativeArray<Checkers.Piece>(8 * 8, Allocator.TempJob);
+                    foreach (var piece in ((Checkers.Game)game).board)
+                    {
+                        leafJob.checkersBoard[i] = piece;
+                        i++;
+                    }
+
+                    leafJob.tictactoeBoard = new NativeArray<char>(0, Allocator.TempJob);
+                    break;
+                
+                case GameType.TicTacToe:
+                    leafJob.tictactoeBoard = new NativeArray<char>(3 * 3, Allocator.TempJob);
+                    foreach (var piece in ((TicTacToe.Game)game).board)
+                    {
+                        leafJob.tictactoeBoard[i] = piece;
+                        i++;
+                    }
+
+                    leafJob.checkersBoard = new NativeArray<Piece>(0, Allocator.TempJob);
+                    break;
+            }
 
             var handle = leafJob.Schedule(result.Length, 1);
             handle.Complete();
@@ -76,8 +104,10 @@ namespace General
             }
 
             rewardAverage /= NumberOfParallelSimulations;
-
+            
             result.Dispose();
+            leafJob.checkersBoard.Dispose();
+            leafJob.tictactoeBoard.Dispose();
 
             return rewardAverage;
         

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Help;
 using Unity.Collections;
 using Unity.Jobs;
@@ -22,8 +23,6 @@ namespace General
 
         private static readonly float ExplorationConstant = 0.7f;
         
-        private static readonly int NumberOfParallelSimulations = 2;
-
         public Node(Game game)
         {
             value = 0;
@@ -51,64 +50,31 @@ namespace General
             
         }
 
-        public float GetRollout(PlayerType mctsPlayer)
+        public float GetRollout(PlayerType mctsPlayer, int numberOfParallelSimulations)
         {
             var simulationGame = game.CreateClone();
-            GameState state;
-
+            
             if (simulationGame.GetCurrentGameState() != GameState.InProgress)
-                return MCTSLeafJob.GetRewardFromState(simulationGame.GetCurrentGameState(), mctsPlayer);
-
-
-            var result = new NativeArray<float>(NumberOfParallelSimulations, Allocator.TempJob);
-            var leafJob = new MCTSLeafJob();
-            leafJob.player = mctsPlayer;
-            leafJob.result = result;
-            leafJob.gameType = Manager.gameType;
-
-            var i = 0;
-            switch (Manager.gameType)
+                return MCTSLeafTask.GetRewardFromState(simulationGame.GetCurrentGameState(), mctsPlayer);
+            
+            var tasks = new Task<float>[numberOfParallelSimulations];
+            
+            for (var i = 0; i < tasks.Length; i++)
             {
-                case GameType.Checkers:
-                    
-                    leafJob.checkersBoard = new NativeArray<Checkers.Piece>(8 * 8, Allocator.TempJob);
-                    foreach (var piece in ((Checkers.Game)game).board)
-                    {
-                        leafJob.checkersBoard[i] = piece;
-                        i++;
-                    }
-
-                    leafJob.tictactoeBoard = new NativeArray<char>(0, Allocator.TempJob);
-                    break;
-                
-                case GameType.TicTacToe:
-                    leafJob.tictactoeBoard = new NativeArray<char>(3 * 3, Allocator.TempJob);
-                    foreach (var piece in ((TicTacToe.Game)game).board)
-                    {
-                        leafJob.tictactoeBoard[i] = piece;
-                        i++;
-                    }
-
-                    leafJob.checkersBoard = new NativeArray<Piece>(0, Allocator.TempJob);
-                    break;
+                tasks[i] = Task<float>.Factory.StartNew( () => MCTSLeafTask.MakeSimulation(game, mctsPlayer) );
             }
 
-            var handle = leafJob.Schedule(result.Length, 1);
-            handle.Complete();
-
+            Task.WaitAll(tasks);
+            
             var rewardAverage = 0f;
             
-            foreach (var reward in result)
+            foreach (var task in tasks)
             {
-                rewardAverage += reward;
+                rewardAverage += task.Result;
             }
 
-            rewardAverage /= NumberOfParallelSimulations;
+            rewardAverage /= numberOfParallelSimulations;
             
-            result.Dispose();
-            leafJob.checkersBoard.Dispose();
-            leafJob.tictactoeBoard.Dispose();
-
             return rewardAverage;
         
 
@@ -148,12 +114,15 @@ namespace General
             return children[0];
         }
 
-        public void Expand()
+        public Node Expand()
         {
             if (IsExpandable())
             {
                 children.Add(new Node(this, remainingMoves.Pop(), game));
+                return children[^1];
             }
+
+            return null;
         }
 
         private void InitialiseNode()

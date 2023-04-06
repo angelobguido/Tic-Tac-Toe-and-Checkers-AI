@@ -10,41 +10,20 @@ using UnityEngine;
 
 namespace General
 {
-    [BurstCompile]
-    public struct MCTSLeafJob : IJobParallelFor
+    public struct MCTSLeafTask
     {
-        public NativeArray<float> result;
-        
-        [ReadOnly]
-        public NativeArray<Checkers.Piece> checkersBoard;
-        [ReadOnly]
-        public NativeArray<char> tictactoeBoard;
-        
-        public PlayerType player;
-        public GameType gameType;
-
-        public void Execute(int i)
+        public static float MakeSimulation(Game game, PlayerType player)
         {
-            Game game = new TicTacToe.Game();
-            switch (gameType)
-            {
-                case GameType.Checkers:
-                    game = new Checkers.Game(checkersBoard, player);
-                    break;
-                
-                case GameType.TicTacToe:
-                    game = new TicTacToe.Game(tictactoeBoard, player);
-                    break;
-            }
+            var copy = game.CreateClone();
             
-            var state = game.MakeRandomMove();
+            var state = copy.MakeRandomMove();
 
             while (state == GameState.InProgress)
             {
-                state = game.MakeRandomMove();
+                state = copy.MakeRandomMove();
             }
             
-            result[i] = GetRewardFromState(state, player);
+            return GetRewardFromState(state, player);
         }
         
         public static float GetRewardFromState(GameState state, PlayerType mctsPlayer)

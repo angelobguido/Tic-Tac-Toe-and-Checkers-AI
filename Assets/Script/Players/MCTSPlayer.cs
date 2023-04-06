@@ -6,12 +6,13 @@ namespace General
     
     public class MCTSPlayer : Player
     {
+        [SerializeField] public MCTSParameters parameters;
         private MCTS mcts;
 
         private IEnumerator Start()
         {
             yield return null;
-            mcts = new MCTS(Manager.game, playerType);
+            mcts = new MCTS(Manager.game, playerType, parameters);
         }
 
         protected override void OnEnable()

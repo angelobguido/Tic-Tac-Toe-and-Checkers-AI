@@ -11,23 +11,6 @@ namespace TicTacToe
     {
         public char[,] board;
 
-        public Game(NativeArray<char> boardArray, PlayerType player)
-        {
-            board = new char[3, 3];
-            var i = 0;
-            for (var row = 0; row < 3; row++)
-            {
-                for (var column = 0; column < 3; column++)
-                {
-                    board[row, column] = boardArray[i];
-                    i++;
-                }
-            }
-
-            this.nextPlayer = player;
-            UpdateValidMoves();
-        }
-        
         public Game()
         {
             InitGame();
@@ -98,17 +81,9 @@ namespace TicTacToe
 
         protected override void UpdateValidMoves()
         {
-            validMoves.Clear();
-            for (var row = 0; row < 3; row++)
-            {
-                for (var column = 0; column < 3; column++)
-                {
-                    if(board[row, column] is not 'X' or 'O')
-                        validMoves.Add(new Move(row, column));
-                    
-                }
-            }
+            var moveIndex = validMoves.FindIndex(validMove => validMove.Equals(lastMove));
             
+            validMoves.RemoveAt(moveIndex);
         }
         
         protected override GameState CheckGameState()

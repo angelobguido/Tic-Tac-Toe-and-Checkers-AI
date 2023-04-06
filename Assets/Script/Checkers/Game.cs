@@ -18,23 +18,6 @@ namespace Checkers
             return new Game(this);
         }
         
-        public Game(NativeArray<Piece> boardArray, PlayerType player)
-        {
-            board = new Piece[8, 8];
-            var i = 0;
-            for (var row = 0; row < 8; row++)
-            {
-                for (var column = 0; column < 8; column++)
-                {
-                    board[row, column] = boardArray[i];
-                    i++;
-                }
-            }
-
-            this.nextPlayer = player;
-            UpdateValidMoves();
-        }
-        
         public Game()
         {
             InitGame();

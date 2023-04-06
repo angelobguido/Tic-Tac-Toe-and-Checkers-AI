@@ -10,10 +10,13 @@ namespace General
     {
 
         [SerializeField] private BoardDrawer drawer;
-        [SerializeField] private Player first;
-        [SerializeField] private Player second;
+        [SerializeField] private GameObject firstPlayerObject;
+        [SerializeField] private GameObject secondPlayerObject;
         [SerializeField] private int nextScene;
-        [SerializeField] public static GameType gameType;
+        [SerializeField] public GameType gameType;
+        
+        private Player first;
+        private Player second;
         
         public static Game game;
 
@@ -21,6 +24,9 @@ namespace General
 
         private void Awake()
         {
+            first = firstPlayerObject.GetComponent<Player>();
+            second = secondPlayerObject.GetComponent<Player>();
+
             switch (gameType)
             {
                 case GameType.TicTacToe: game = new TicTacToe.Game();
